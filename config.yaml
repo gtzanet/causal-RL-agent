@@ -1,0 +1,93 @@
+dataset:
+  train_data_path: "data/260320/services_real_dataset_bd_timeout.csv"
+  eval_data_path: "data/260320/services_real_dataset_ud.csv"
+
+agents:
+  use_tabular_agent: true
+
+features:
+  keep_columns: null
+  state_space_cols:
+    - "service_frame_resizer_replicas"
+    - "service_object_detector_replicas"
+    - "service_frame_sampler_arrival_rate"
+  state_col_prefix: null
+  action_columns:
+    - "service_frame_resizer_replicas"
+    - "service_object_detector_replicas"
+  latency_column: "service_object_detector_latency"
+  action_space: null
+
+reward_function:
+  sla_latency_ms: 100.0
+  r_max: 100.0
+  w_lat: 0.3333333333333333
+  w_res: 0.6666666666666666
+  lat_below_ref_decay: 0.06
+  lat_above_ref_decay: 10.0
+  lat_shape_gain: 1.0
+  invalid_or_slo_penalty: -100.0
+
+causal:
+  labels: null
+  adj: null
+  to_env_col: null
+  target_label: null
+  parent_weight_threshold: 0.2
+  use_notears: true
+  notears_max_iter: 100
+  notears_weight_threshold: 5.0
+  notears_fixed_edges: null
+#    - ['service_frame_sampler_arrival_rate', 'service_frame_resizer_arrival_rate']
+#    - ['service_frame_resizer_arrival_rate', 'service_object_detector_arrival_rate']
+#    - ['service_frame_resizer_replicas', 'service_object_detector_arrival_rate']
+#    - ['service_object_detector_replicas', 'e2e_latency']
+#    - ['service_object_detector_arrival_rate', 'e2e_latency']
+
+  causal_discovery_cols:
+    - "service_frame_sampler_arrival_rate"
+    - "service_frame_resizer_arrival_rate"
+    - "service_object_detector_arrival_rate"
+    - "service_frame_resizer_replicas"
+    - "service_object_detector_replicas"
+    - "e2e_latency"
+
+split:
+  ud_train_split_frac: 0.8
+  ud_split_seed: 42
+  n_bins: 6
+  max_steps_per_episode: 5
+
+training:
+  episodes: 6000
+  alpha: 0.1
+  gamma: 0.90
+  epsilon_start: 1.0
+  epsilon_end: 0.01
+  epsilon_decay: 0.995
+
+dqn:
+  replay_buffer_size: 50000
+  batch_size: 64
+  replay_warmup_epochs: 100
+  target_update_epochs: 5
+  updates_per_step: 1
+  hidden_dim_1: 64
+  hidden_dim_2: 64
+  eval_interval_epochs: 50
+  eval_episodes: 3
+
+rd_experiment:
+  n_repeats: 3
+  rd_train_episodes: 2500
+  rd_eval_episodes: 300
+  point_seed: 1000
+
+threshold_experiment:
+  rd_added_points_ratio: 0.1
+  rd60_point_seed: 2026
+  threshold_values: [120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 500]
+  threshold_train_episodes: 1500
+  threshold_eval_episodes: 300
+  n_repeats: 3
+  target_violation_rate: 0.3
